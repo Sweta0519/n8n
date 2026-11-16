@@ -107,6 +107,8 @@ const agentListFilterSchema = z
 		availableInMCP: z.boolean().optional(),
 		availableInChat: z.boolean().optional(),
 		includeArchived: z.boolean().optional(),
+		parentFolderId: z.string().min(1).max(36).nullable().optional(),
+		includeDescendants: z.boolean().optional(),
 		active: z.boolean().optional(),
 		projectId: z.string().min(1).optional(),
 	})
@@ -244,6 +246,7 @@ const createAgentToolEntrySchema = z.object({
 
 const createAgentShape = {
 	name: z.string().trim().min(1).max(128),
+	parentFolderId: z.string().min(1).max(36).nullable().optional(),
 	id: clientMintedAgentIdSchema.optional(),
 	config: AgentJsonConfigSchema.optional(),
 	schema: AgentJsonConfigSchema.optional(),
@@ -262,6 +265,8 @@ const createAgentSchema = z
 type CreateAgent = z.infer<typeof createAgentSchema>;
 
 export class CreateAgentDto implements CreateAgent {
+	declare parentFolderId?: CreateAgent['parentFolderId'];
+
 	declare name: CreateAgent['name'];
 
 	declare id?: CreateAgent['id'];
@@ -318,6 +323,10 @@ export class CreateAgentPublicDto extends Z.class(
 	{ strict: true },
 ) {}
 
+export class MoveAgentDto extends Z.class({
+	parentFolderId: z.string().min(1).max(36).nullable(),
+}) {}
+
 export class UpdateAgentConfigDto extends Z.class({
 	config: z.record(z.unknown()),
 	/** Hash of the config the edit was made against (`null` when the agent had none). */
@@ -366,6 +375,7 @@ const agentPublicShape = {
 	id: z.string(),
 	name: z.string(),
 	projectId: z.string(),
+	parentFolderId: z.string().nullable().optional(),
 	project: agentProjectResponseSchema,
 	availableInMCP: z.boolean(),
 	isArchived: z.boolean(),
@@ -422,6 +432,8 @@ const agentListItemShape = {
 	id: z.string(),
 	name: z.string(),
 	projectId: z.string(),
+	parentFolderId: z.string().nullable().optional(),
+	folderPath: z.array(z.string()).optional(),
 	project: agentProjectResponseSchema,
 	availableInMCP: z.boolean(),
 	isArchived: z.boolean(),
@@ -455,6 +467,7 @@ const updateAgentObjectSchema = z
 		id: strippedAgentField,
 		name: strippedAgentField,
 		projectId: strippedAgentField,
+		parentFolderId: strippedAgentField,
 		project: strippedAgentField,
 		availableInMCP: strippedAgentField,
 		isArchived: strippedAgentField,

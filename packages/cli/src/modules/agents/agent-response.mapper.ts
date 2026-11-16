@@ -36,6 +36,7 @@ export function mapAgentDto(agent: Agent, state: AgentRunnableState): AgentDto {
 		id: agent.id,
 		name: agent.name ?? '',
 		projectId: agent.projectId ?? '',
+		parentFolderId: agent.parentFolderId ?? null,
 		project: mapProject(agent.project),
 		availableInMCP: agent.availableInMCP ?? false,
 		isArchived: agent.isArchived,
@@ -63,12 +64,13 @@ export function mapAgentDto(agent: Agent, state: AgentRunnableState): AgentDto {
  * page), so the card can flag skill-only changes without loading the agent.
  */
 export function mapAgentListItem(
-	agent: Agent & { skillVersions?: Record<string, AgentSkillVersionInfo> },
+	agent: Agent & { skillVersions?: Record<string, AgentSkillVersionInfo>; folderPath?: string[] },
 ): AgentListItemDto {
 	return {
 		id: agent.id,
 		name: agent.name ?? '',
 		projectId: agent.projectId ?? '',
+		parentFolderId: agent.parentFolderId ?? null,
 		project: mapProject(agent.project),
 		availableInMCP: agent.availableInMCP ?? false,
 		isArchived: agent.isArchived,
@@ -79,6 +81,7 @@ export function mapAgentListItem(
 		personalisation: agent.schema?.personalisation ?? null,
 		hasConfig: isPresent(agent.schema),
 		...(agent.skillVersions === undefined ? {} : { skillVersions: agent.skillVersions }),
+		...(agent.folderPath === undefined ? {} : { folderPath: agent.folderPath }),
 	};
 }
 
