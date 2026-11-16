@@ -1,6 +1,7 @@
 import {
 	findDuplicateProjectIds,
 	findProjectLimitsAboveInstanceLimit,
+	resolveApplicableLimits,
 } from '../execution-limit-rules';
 
 describe('findDuplicateProjectIds', () => {
@@ -38,5 +39,21 @@ describe('findProjectLimitsAboveInstanceLimit', () => {
 
 	it('returns nothing when the instance has no limit', () => {
 		expect(findProjectLimitsAboveInstanceLimit(limits, null)).toEqual([]);
+	});
+});
+
+describe('resolveApplicableLimits', () => {
+	it('returns the period, the instance limit and the project limit, without the default for new projects', () => {
+		const settings = {
+			periodUnit: 'week' as const,
+			instanceMaxExecutions: 1000,
+			defaultProjectMaxExecutions: 10,
+		};
+
+		expect(resolveApplicableLimits(settings, 50)).toEqual({
+			periodUnit: 'week',
+			instanceMaxExecutions: 1000,
+			projectMaxExecutions: 50,
+		});
 	});
 });

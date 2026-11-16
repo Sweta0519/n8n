@@ -1,4 +1,6 @@
-import type { ProjectLimit } from './execution-limits.types';
+import type { ExecutionLimitSettings } from '@n8n/api-types';
+
+import type { ApplicableLimits, ProjectLimit } from './execution-limits.types';
 
 /** The project ids that occur more than one time in `limits`. */
 export function findDuplicateProjectIds(limits: ProjectLimit[]): string[] {
@@ -26,4 +28,16 @@ export function findProjectLimitsAboveInstanceLimit(
 	return limits
 		.filter(({ maxExecutions }) => maxExecutions > instanceMaxExecutions)
 		.map(({ projectId }) => projectId);
+}
+
+/** The limits that the enforcement check compares with the usage of one project. */
+export function resolveApplicableLimits(
+	settings: ExecutionLimitSettings,
+	projectMaxExecutions: number | null,
+): ApplicableLimits {
+	return {
+		periodUnit: settings.periodUnit,
+		instanceMaxExecutions: settings.instanceMaxExecutions,
+		projectMaxExecutions,
+	};
 }
