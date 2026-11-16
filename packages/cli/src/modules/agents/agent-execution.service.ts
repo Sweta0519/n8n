@@ -24,7 +24,11 @@ import { Telemetry } from '@/telemetry';
 import { AgentProjectDeletionRepository } from './repositories/agent-project-deletion.repository';
 import { AgentChatAttachmentService } from './agent-chat-attachment.service';
 import type { StoredAttachmentRef } from './types/agent-chat-attachment';
-import { AgentExecutionMetrics, type AgentMetricsSubject } from './agent-execution-metrics';
+import {
+	AgentExecutionMetrics,
+	type AgentMetricsSubject,
+	type FinishedAgentExecutionStatus,
+} from './agent-execution-metrics';
 import { AgentExecutionUpdateBroadcaster } from './agent-execution-update-broadcaster';
 import { AgentTurnAlreadyRunningError } from './agent-turn-already-running.error';
 import { SESSION_STOPPED_REASON } from './agent-session-stop-reason';
@@ -606,9 +610,8 @@ export class AgentExecutionService {
 	/** A metrics failure must not fail an execution that is already stored. */
 	private reportFinishedExecution(
 		params: RecordMessageParams,
-		status: AgentExecution['status'],
+		status: FinishedAgentExecutionStatus,
 	): void {
-		if (status === 'running' || status === 'interrupted') return;
 		try {
 			this.metrics.finished(
 				metricsSubjectOf(params),
@@ -1485,7 +1488,7 @@ function metricsSubjectOf(
 
 function executionStatus(
 	params: Pick<RecordMessageParams, 'record' | 'hitlStatus' | 'source'>,
-): AgentExecution['status'] {
+): FinishedAgentExecutionStatus {
 	const { record } = params;
 	if (record.error !== null || record.finishReason === 'error') return 'error';
 	if (record.finishReason === 'cancelled') return 'cancelled';
