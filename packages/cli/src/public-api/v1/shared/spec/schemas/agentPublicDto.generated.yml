@@ -1,0 +1,74 @@
+type: object
+properties:
+  id:
+    type: string
+  name:
+    type: string
+  projectId:
+    type: string
+  project:
+    type: object
+    nullable: true
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+    required:
+      - id
+      - name
+      - type
+  availableInMCP:
+    type: boolean
+  isArchived:
+    type: boolean
+  versionId:
+    type: string
+    nullable: true
+  activeVersionId:
+    type: string
+    nullable: true
+  createdAt:
+    type: string
+  updatedAt:
+    type: string
+  config:
+    type: object
+    nullable: true
+  configHash:
+    type: string
+    nullable: true
+  tools:
+    type: object
+    additionalProperties:
+      type: object
+  activeVersion:
+    type: object
+    nullable: true
+    properties:
+      versionId:
+        type: string
+      integrations:
+        type: array
+        items:
+          type: object
+    required:
+      - versionId
+      - integrations
+required:
+  - id
+  - name
+  - projectId
+  - project
+  - availableInMCP
+  - isArchived
+  - versionId
+  - activeVersionId
+  - createdAt
+  - updatedAt
+  - config
+  - configHash
+  - tools
+  - activeVersion
