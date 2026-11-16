@@ -3,6 +3,10 @@ import { type OperationContext, TransactionRunner } from '@n8n/db';
 import { Service } from '@n8n/di';
 import { BadRequestError } from '@n8n/errors';
 
+import type {
+	AccountProject,
+	ServiceAccountProjectSource,
+} from '@/services/service-account-projects';
 import { ServiceAccountService } from '@/services/service-account.service';
 
 import type { Agent } from './entities/agent.entity';
@@ -13,7 +17,7 @@ class IdentityAlreadyLinkedError extends Error {}
 
 /** Links an agent to the service account that acts for it. */
 @Service()
-export class AgentServiceAccountService {
+export class AgentServiceAccountService implements ServiceAccountProjectSource {
 	constructor(
 		private readonly agentsConfig: AgentsConfig,
 		private readonly serviceAccountService: ServiceAccountService,
@@ -55,5 +59,18 @@ export class AgentServiceAccountService {
 			if (error instanceof IdentityAlreadyLinkedError) return;
 			throw error;
 		}
+	}
+
+	/** The project of each agent, by the ID of its service account. */
+	async findProjectsOfAccounts(accountIds: string[]): Promise<Map<string, AccountProject>> {
+		const rows = await this.agentRepository.findProjectsByIdentityIds(accountIds);
+		return new Map(
+			rows.map((row) => [row.identityId, { id: row.projectId, name: row.projectName }]),
+		);
+	}
+
+	/** The service accounts of the agents in these projects. */
+	async findAccountIdsInProjects(projectIds: string[]): Promise<string[]> {
+		return await this.agentRepository.findIdentityIdsInProjects(projectIds);
 	}
 }

@@ -82,6 +82,8 @@ describe('ProjectService', () => {
 		userRepository,
 		roleRepository,
 		transactions,
+		mock(), // agentsConfig
+		mock(), // serviceAccountProjects
 	);
 
 	beforeEach(() => {
